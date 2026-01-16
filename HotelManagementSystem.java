@@ -40,5 +40,62 @@ public class HotelManagementSystem {
             reservations.add(reservation);
             return reservation;
         }
+                private Room findAvailableRoom(Date checkIn, Date checkOut, RoomType roomType) {
+            for (Room room : rooms) {
+                if (room.getType() == roomType && room.isAvailable(checkIn, checkOut)) {
+                    return room;
+                }
+            }
+            return null;
+        }
+        
+        public boolean checkIn(Reservation reservation) {
+            return reservation.checkIn();
+        }
+        
+        public void checkOut(Room room) {
+            room.checkOut();
+        }
+    }
     
+    // --- Room Class ---
+    public static class Room {
+        private final int roomNumber;
+        private final RoomType type;
+        private final double pricePerNight;
+        private Guest currentGuest;
+        private final List<Reservation> reservations;
+        
+        public Room(int roomNumber, RoomType type, double pricePerNight) {
+            this.roomNumber = roomNumber;
+            this.type = type;
+            this.pricePerNight = pricePerNight;
+            this.reservations = new ArrayList<>();
+        }
+        
+        public boolean isAvailable(Date checkIn, Date checkOut) {
+            for (Reservation res : reservations) {
+                if (res.overlaps(checkIn, checkOut)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        
+        public boolean checkIn(Guest guest) {
+            if (currentGuest != null) return false;
+            this.currentGuest = guest;
+            return true;
+        }
+        
+        public void checkOut() {
+            this.currentGuest = null;
+        }
+        
+        public int getRoomNumber() { return roomNumber; }
+        public RoomType getType() { return type; }
+        public double getPricePerNight() { return pricePerNight; }
+        public boolean isOccupied() { return currentGuest != null; }
+    }
+
 

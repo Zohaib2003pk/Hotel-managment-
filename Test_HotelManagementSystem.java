@@ -26,3 +26,15 @@ public class HotelManagementSystemTest {
         hotel.addRoom(room);
         assertEquals(101, room.getRoomNumber());
     }
+@Test
+    public void testCreateCustomer() {
+        HotelManagementSystem.Customer customer =
+                new HotelManagementSystem.Customer(
+                        new HotelManagementSystem.Name("John", "Doe"),
+                        new HotelManagementSystem.Address("Street", "City", "12345"),
+                        new HotelManagementSystem.CreditCard("1111", "12/30")
+                );
+
+        assertNotNull(customer);
+        assertNotNull(customer.getId());
+    }

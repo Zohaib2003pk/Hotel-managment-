@@ -170,6 +170,138 @@ public class HotelManagementSystem {
     
     // --- Guest Class (Simpler) ---
     public record Guest(Name name, Address address) {}
-    
+       public static void main(String[] args) {
+
+    Scanner sc = new Scanner(System.in);
+
+    // Create hotel
+    Hotel hotel = new Hotel("Grand Palace");
+
+    // Add rooms
+    hotel.addRoom(new Room(101, RoomType.DELUXE, 250));
+    hotel.addRoom(new Room(102, RoomType.DELUXE, 250));
+    hotel.addRoom(new Room(201, RoomType.SINGLE, 120));
+    hotel.addRoom(new Room(202, RoomType.DOUBLE, 180));
+
+    // Store reservations by ID
+    Map<String, Reservation> reservationMap = new HashMap<>();
+
+    int choice;
+
+    do {
+        System.out.println("\n===== HOTEL MANAGEMENT SYSTEM =====");
+        System.out.println("1. View Available Room Types");
+        System.out.println("2. Make a New Reservation");
+        System.out.println("3. View My Reservation");
+        System.out.println("4. Check-In");
+        System.out.println("5. Exit");
+        System.out.print("Select an option: ");
+
+        choice = sc.nextInt();
+        sc.nextLine(); // clear buffer
+
+        switch (choice) {
+
+            //View available room types
+            case 1 -> {
+                System.out.println("\n--- Available Room Types ---");
+                for (RoomType type : RoomType.values()) {
+                    System.out.println(type);
+                }
+                System.out.println("Availability is confirmed during reservation.");
+            }
+
+            //Make a reservation
+            case 2 -> {
+                try {
+                    System.out.print("First Name: ");
+                    String firstName = sc.nextLine();
+
+                    System.out.print("Last Name: ");
+                    String lastName = sc.nextLine();
+
+                    System.out.print("City: ");
+                    String city = sc.nextLine();
+
+                    System.out.print("Credit Card Number: ");
+                    String card = sc.nextLine();
+
+                    System.out.print("Expiry Date (MM/YY): ");
+                    String expiry = sc.nextLine();
+
+                    System.out.print("Room Type (SINGLE / DOUBLE / DELUXE / SUITE): ");
+                    RoomType roomType =
+                            RoomType.valueOf(sc.nextLine().toUpperCase());
+
+                    Calendar cal = Calendar.getInstance();
+                    Date checkIn = cal.getTime();
+                    cal.add(Calendar.DAY_OF_YEAR, 2);
+                    Date checkOut = cal.getTime();
+
+                    Customer customer = new Customer(
+                            new Name(firstName, lastName),
+                            new Address("Street", city, "00000"),
+                            new CreditCard(card, expiry)
+                    );
+
+                    Reservation reservation =
+                            hotel.makeReservation(customer, checkIn, checkOut, roomType);
+
+                    customer.addReservation(reservation);
+                    reservationMap.put(reservation.getId(), reservation);
+
+                    System.out.println("\n✅ Reservation Successful!");
+                    System.out.println("Reservation ID: " + reservation.getId());
+                    System.out.println("Total Cost: $" + reservation.calculateTotalCost());
+
+                } catch (Exception e) {
+                    System.out.println("❌ Reservation Failed: " + e.getMessage());
+                }
+            }
+
+            //View reservation
+            case 3 -> {
+                System.out.print("Enter Reservation ID: ");
+                String id = sc.nextLine();
+
+                Reservation res = reservationMap.get(id);
+                if (res != null) {
+                    System.out.println("\n--- Reservation Details ---");
+                    System.out.println("Customer: " +
+                            res.getCustomer().getName().firstName() + " " +
+                            res.getCustomer().getName().lastName());
+                    System.out.println("Room Number: " + res.getRoom().getRoomNumber());
+                    System.out.println("Room Type: " + res.getRoom().getType());
+                    System.out.println("Total Cost: $" + res.calculateTotalCost());
+                } else {
+                    System.out.println("❌ Reservation not found.");
+                }
+            }
+
+            //Check-in
+            case 4 -> {
+                System.out.print("Enter Reservation ID: ");
+                String id = sc.nextLine();
+
+                Reservation res = reservationMap.get(id);
+                if (res != null && hotel.checkIn(res)) {
+                    System.out.println("✅ Check-in successful!");
+                } else {
+                    System.out.println("❌ Check-in failed.");
+                }
+            }
+
+            // Exit
+            case 5 -> System.out.println("Thank you for using the system. Goodbye!");
+
+            default -> System.out.println("Invalid option. Please try again.");
+        }
+
+    } while (choice != 5);
+
+    sc.close();
+}
+}
+
 
 
